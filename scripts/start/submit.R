@@ -58,7 +58,13 @@ submit <- function(cfg, restart = FALSE, stopOnFolderCreateError = TRUE) {
                    && !is.null(piamenv::showUpdates())) {
           message("Consider updating with `make update-renv`.")
         }
-
+        # For packages which are used for inputdata as well as in a REMIND run:
+        # Ensure coherence and load package versions corresponding to inputdata
+        inputRenvLock <- file.path("/p/projects/remind/inputdata/RenvLockFiles", paste0(cfg$inputRevision, ".lock"))
+        if (file.exists(inputRenvLock)) {
+          message("   Loading coherent package versions for inputdata from '", inputRenvLock, "'... ", appendLF = FALSE)
+          piamenv::restoreRenv(inputRenvLock)
+        }
         message("   Generating lockfile '", file.path(cfg$results_folder, "renv.lock"), "'... ", appendLF = FALSE)
         # suppress output of renv::snapshot
         utils::capture.output({

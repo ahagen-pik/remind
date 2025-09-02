@@ -60,10 +60,12 @@ submit <- function(cfg, restart = FALSE, stopOnFolderCreateError = TRUE) {
         }
         # For packages which are used for inputdata as well as in a REMIND run:
         # Ensure coherence and load package versions corresponding to inputdata
-        inputRenvLock <- file.path("/p/projects/remind/inputdata/RenvLockFiles", paste0(cfg$inputRevision, ".lock"))
+        inputRenvLock <- file.path("/p/projects/remind/inputdata/RenvLockFiles", paste0("rev", cfg$inputRevision, ".lock"))
         if (file.exists(inputRenvLock)) {
-          message("   Loading coherent package versions for inputdata from '", inputRenvLock, "'... ", appendLF = FALSE)
-          piamenv::restoreRenv(inputRenvLock)
+          message("   Loading consistent package versions for inputdata from '", inputRenvLock, "'... ")
+          renv::restore(lockfile = inputRenvLock, packages = c("edgeTransport", "mrcommons", "mrfaocore", "mrlandcore", "mrtransport", "reporttransport"))
+        } else {
+          message("   No inputRenvLock found here: '", inputRenvLock, "'.  Consistency with inputdata versions not ensured.")
         }
         message("   Generating lockfile '", file.path(cfg$results_folder, "renv.lock"), "'... ", appendLF = FALSE)
         # suppress output of renv::snapshot
